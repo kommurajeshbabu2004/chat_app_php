@@ -12,7 +12,7 @@ if ($conn->connect_error) {
 }
 
 // Create database
-$sql = "CREATE DATABASE IF NOT EXISTS chat_app";
+$sql = "CREATE DATABASE IF NOT EXISTS chat_application";
 if ($conn->query($sql) === TRUE) {
     echo "Database created successfully.<br>";
 } else {
@@ -20,33 +20,37 @@ if ($conn->query($sql) === TRUE) {
 }
 
 // Use the chat_app database
-$conn->select_db('chat_app');
+$conn->select_db('chat_application');
 
 // Create users table
-$sql = "CREATE TABLE IF NOT EXISTS users (
-    user_id INT AUTO_INCREMENT PRIMARY KEY,
-    username VARCHAR(50) NOT NULL,
+$sql = "CREATE TABLE IF NOT EXISTS userstable (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    username VARCHAR(100) NOT NULL,
     password VARCHAR(255) NOT NULL,
-    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+    unique_id VARCHAR(50) NOT NULL UNIQUE,  -- Unique identification number
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
 )";
 if ($conn->query($sql) === TRUE) {
-    echo "Table 'users' created successfully.<br>";
+    echo "Table 'userstable' created successfully.<br>";
 } else {
-    echo "Error creating table 'users': " . $conn->error;
+    echo "Error creating table 'userstable': " . $conn->error;
 }
 
 // Create messages table
-$sql = "CREATE TABLE IF NOT EXISTS messages (
-    message_id INT AUTO_INCREMENT PRIMARY KEY,
-    user_id INT,
-    message TEXT,
-    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    FOREIGN KEY (user_id) REFERENCES users(user_id)
+$sql = "CREATE TABLE IF NOT EXISTS messagestable (
+    id INT AUTO_INCREMENT PRIMARY KEY,     -- Unique message ID
+    sender_id INT NOT NULL,                 -- User ID of the sender (foreign key to the users table)
+    receiver_id INT NOT NULL,               -- User ID of the receiver (foreign key to the users table)
+    message TEXT NOT NULL,                  -- Message content
+    timestamp TIMESTAMP DEFAULT CURRENT_TIMESTAMP, -- Timestamp when the message was sent
+    FOREIGN KEY (sender_id) REFERENCES userstable(id) ON DELETE CASCADE,  -- Foreign key linking to the users table
+    FOREIGN KEY (receiver_id) REFERENCES userstable(id) ON DELETE CASCADE -- Foreign key linking to the users table
 )";
 if ($conn->query($sql) === TRUE) {
-    echo "Table 'messages' created successfully.<br>";
+    echo "Table 'messagestable' created successfully.<br>";
 } else {
-    echo "Error creating table 'messages': " . $conn->error;
+    echo "Error creating table 'messagestable': " . $conn->error;
 }
 
 // Close the connection
